@@ -6,5 +6,22 @@ body { font-family: system-ui, -apple-system, "Segoe UI", "Note Scan JP", sans-s
 .todo-add { padding: 10px 12px; cursor: pointer;}
 .todo-list { margin-top: 16px; padding-left: 18px; }
 .todo-list li { cursor: pointer; }
-.todo-list li.is-done { text-decoration: line-through; opacity: 0.7; }
+.todo-item.is-done .todo-text {
+    text-decoration: line-through;
+    opacity:0.7;
+}
+.todo.item.is-done .todo-delete {
+    text-decoration: none;
+    opacity: 1;
+}
+.todo-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+.todo-delete {
+    padding: 6px 10px;
+    cursor: pointer;
+}
 

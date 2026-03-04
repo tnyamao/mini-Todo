@@ -21,7 +21,12 @@ function escapeHtml(str) {
 function render() {
     list.innerHTML = todos.map(t => {
         const doneClass = t.done ? 'is-done' : '';
-        return `<li class="${doneClass}" data-id="${t.id}">${escapeHtml(t.text)}</li>`;
+        return `
+            <li class="todo-item ${doneClass}" data-id="${t.id}" >
+                <span class="todo-text">${escapeHtml(t.text)}</span>
+                <button class="todo-delete" type="button">削除</button>
+            </li>
+        `;
     }).join('');
 };
 
@@ -37,19 +42,29 @@ form.addEventListener('submit', (e) => {
 });
 
 list.addEventListener('click', (e) => {
-    const li = e.target.closest('li');
-
     if (!(e.target instanceof Element)) {
         return;
     }
-
-    const id = Number(li.dataset.id);
-
-    const t = todos.find(x => x.id === id);
-
+    const li = e.target.closest('li.todo-item');
     if (!li) return;
+    const id = Number(li.dataset.id);
+    if (Number.isNaN(id)) return;
 
-    t.done = !t.done;
+    if (e.target.closest('button.todo-delete')) {
+        todos = todos.filter(x => x.id !== id);
+        render();
+        return;
+    }
+
+    if (e.target.closest('.todo-text')) {
+        const t = todos.find(x => x.id === id);
+
+    
+        if(!t) return;
+        t.done = !t.done;
+        render();
+    }
+    
     render();
 });
 
