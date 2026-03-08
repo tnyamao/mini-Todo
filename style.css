@@ -25,3 +25,9 @@ body { font-family: system-ui, -apple-system, "Segoe UI", "Note Scan JP", sans-s
     cursor: pointer;
 }
 
+.todo-error {
+    margin-top: 8px;
+    color: #c62828;
+    font-size: 14px;
+    min-height: 1em;
+}

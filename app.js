@@ -1,11 +1,22 @@
-'use strict;'
+'use strict';
 
 const form = document.getElementById('todo-form');
 const input = document.getElementById('todo-input');
 const list = document.getElementById('todo-list');
+const errorEl = document.getElementById('todo-error');
+
+function setError(message) {
+    if (!errorEl) return;
+    errorEl.textContent = message;
+}
+
+function clearError() {
+    setError('');
+}
+
 
 let nextId = 1;
-/** @type {{id:number, text:string, done:boolean} []} **/
+/** @type {{id:number, text:string, done:boolean} []} */
 let todos = [];
 
 const STORAGE_KEY = 'miniTodo.v1';
@@ -54,17 +65,21 @@ function render() {
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
+
     const text = input.value.trim();
-    if (!text) return;
+    if (!text) {
+        setError('タスクを入力してください。');
+        input.focus();
+        return;
+    }
+
+    clearError();
 
     todos.push({ id: nextId++, text, done: false });
-
-    saveState();
-    render();
-
     input.value = '';
     input.focus();
-
+    saveState();
+    render();
 });
 
 list.addEventListener('click', (e) => {
