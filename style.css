@@ -1,25 +1,56 @@
 * { box-sizing: border-box;}
-body { font-family: system-ui, -apple-system, "Segoe UI", "Note Scan JP", sans-serif; margin: 0; padding: 32px; }
-.container { width: min(720px, 100%); margin: 0 auto;}
-.todo-from { display: flex; gap: 8px;}
-.todo-input { flex: 1; padding: 10px;}
-.todo-add { padding: 10px 12px; cursor: pointer;}
-.todo-list { margin-top: 16px; padding-left: 18px; }
-.todo-list li { cursor: pointer; }
-.todo-item.is-done .todo-text {
-    text-decoration: line-through;
-    opacity:0.7;
+body { 
+    font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans JP", sans-serif;
+    margin: 0; 
+    padding: 32px; 
 }
-.todo.item.is-done .todo-delete {
-    text-decoration: none;
-    opacity: 1;
+
+.container { 
+    width: min(720px, 100%); 
+    margin: 0 auto;
 }
+
+.todo-form { 
+    display: flex; 
+    gap: 8px;
+}
+
+.todo-input { 
+    flex: 1; 
+    padding: 10px;
+}
+
+.todo-add { 
+    padding: 10px 12px; 
+    cursor: pointer;
+}
+
+.todo-list { 
+    margin-top: 16px; 
+    padding-left: 18px; 
+}
+
+.todo-list li { 
+    cursor: pointer; 
+}
+
 .todo-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
 }
+
+.todo-item.is-done .todo-text {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.todo-item.is-done .todo-delete {
+    text-decoration: none;
+    opacity: 1;
+}
+
 .todo-delete {
     padding: 6px 10px;
     cursor: pointer;
@@ -30,4 +61,23 @@ body { font-family: system-ui, -apple-system, "Segoe UI", "Note Scan JP", sans-s
     color: #c62828;
     font-size: 14px;
     min-height: 1em;
+}
+
+.todo-filters {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0 16px;
+}
+
+.filter-button {
+    padding: 8px 12px;
+    border: 1px solid #999;
+    background: #f3f3f3;
+    color: #222;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.filter-button.is-active {
+    background: #ddd;
 }

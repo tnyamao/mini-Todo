@@ -1,15 +1,21 @@
 'use strict';
 
+
+// 定数宣言
 const form = document.getElementById('todo-form');
 const input = document.getElementById('todo-input');
 const list = document.getElementById('todo-list');
 const errorEl = document.getElementById('todo-error');
+const filterButtons = document.querySelectorAll('.filter-button');
+let currentFilter = 'all';
 
+// エラーメッセージ出力
 function setError(message) {
     if (!errorEl) return;
     errorEl.textContent = message;
 }
 
+// エラーメッセーのクリア
 function clearError() {
     setError('');
 }
@@ -19,13 +25,17 @@ let nextId = 1;
 /** @type {{id:number, text:string, done:boolean} []} */
 let todos = [];
 
+//  ??? 
 const STORAGE_KEY = 'miniTodo.v1';
 
+// 状態の保持
 function saveState() {
     const state = { nextId, todos };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+
+// 状態の読み込み
 function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
@@ -42,6 +52,7 @@ function loadState() {
     }
 }
 
+// タスク名の入力に対するエスケープ処理 
 function escapeHtml(str) {
     return str
     .replaceAll('&', '&amp;')
@@ -51,8 +62,20 @@ function escapeHtml(str) {
     .replaceAll("'", '&#39;');
 }
 
+// 登録したタスクをフィルターする
+function getFilteredTodos() {
+    if (currentFilter === 'active') {
+        return todos.filter(t => !t.done);
+    }
+    if (currentFilter === 'done') {
+        return todos.filter(t => t.done);
+    }
+    return todos;
+}
+
+// タスクの表示処理
 function render() {
-    list.innerHTML = todos.map(t => {
+    list.innerHTML = getFilteredTodos().map(t => {
         const doneClass = t.done ? 'is-done' : '';
         return `
             <li class="todo-item ${doneClass}" data-id="${t.id}">
@@ -63,6 +86,8 @@ function render() {
     }).join('');
 }
 
+// 画面表示処理
+// index.htmlを開いた際に最初に表示させる
 form.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -82,6 +107,9 @@ form.addEventListener('submit', (e) => {
     render();
 });
 
+// クリックイベント発生時の処理
+// 追加ボタン押下なら、タスクの追加
+// 削除ボタン押下なら、タスクの削除
 list.addEventListener('click', (e) => {
     if (!(e.target instanceof Element)) {
         return;
@@ -107,6 +135,21 @@ list.addEventListener('click', (e) => {
         saveState();
         render();
     }
+});
+
+// フィルタ機能
+// 全選択、全解除、単体選択
+filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        currentFilter = button.dataset.filter || 'all';
+
+        filterButtons.forEach(btn => {
+            btn.classList.remove('is-active');
+        });
+
+        button.classList.add('is-active');
+        render();
+    });
 });
 
 loadState();

@@ -15,8 +15,13 @@
             <button class="todo-add" type="submit">追加</button>
         </form>
 
-        <ul id="todo-list" class="todo-list"></ul>
         <p id="todo-error" class="todo-error" aria-live="polite"></p>
+        <div class="todo-filters" role="group" aria-label="表示フィルタ">
+            <button type="button" class="filter-button is-active" data-filter="all">すべて</button>
+            <button type="button" class="filter-button" data-filter="active">未完了</button>
+            <button type="button" class="filter-button" data-filter="done">完了</button>
+        </div>
+        <ul id="todo-list" class="todo-list"></ul>
     </main>
 
     <script src="./app.js"></script>
