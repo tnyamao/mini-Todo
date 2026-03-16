@@ -22,10 +22,10 @@ function clearError() {
 
 
 let nextId = 1;
-/** @type {{id:number, text:string, done:boolean} []} */
+/** @type {{id:number, text:string, done:boolean, date:string} []} */
 let todos = [];
 
-//  ??? 
+//  LocalStorage に保存するときのキー 
 const STORAGE_KEY = 'miniTodo.v1';
 
 // 状態の保持
@@ -47,7 +47,8 @@ function loadState() {
             nextId = state.nextId;
             todos = state.todos;
         }
-    } catch {
+    } catch (error) {
+        console.error('状態の読み込みに失敗しました。', error);
 
     }
 }
@@ -100,7 +101,12 @@ form.addEventListener('submit', (e) => {
 
     clearError();
 
-    todos.push({ id: nextId++, text, done: false });
+    todos.push({ 
+        id: nextId++,
+        text,
+        done: false,
+        date: getTodayString(),
+    } );
     input.value = '';
     input.focus();
     saveState();
@@ -153,4 +159,14 @@ filterButtons.forEach(button => {
 });
 
 loadState();
+
+// 今日の日付を yyyy-mm-dd 形式で返す
+function getTodayString() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 render();
