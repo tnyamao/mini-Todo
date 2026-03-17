@@ -7,6 +7,7 @@ const input = document.getElementById('todo-input');
 const list = document.getElementById('todo-list');
 const errorEl = document.getElementById('todo-error');
 const filterButtons = document.querySelectorAll('.filter-button');
+const targetDateInput = document.getElementById('target-date');
 let currentFilter = 'all';
 
 // エラーメッセージ出力
@@ -65,13 +66,18 @@ function escapeHtml(str) {
 
 // 登録したタスクをフィルターする
 function getFilteredTodos() {
+    let filtered = todos;
+    const selectedDate = targetDateInput.value;
+    if (selectedDate) {
+        filtered = filtered.filter(t => t.date === selectedDate);    
+    }
+
     if (currentFilter === 'active') {
-        return todos.filter(t => !t.done);
+        filtered = filtered.filter(t => !t.done);
+    }   else if (currentFilter === 'done') {
+        filtered = filtered.filter(t => t.done);
     }
-    if (currentFilter === 'done') {
-        return todos.filter(t => t.done);
-    }
-    return todos;
+    return filtered
 }
 
 // タスクの表示処理
@@ -101,11 +107,12 @@ form.addEventListener('submit', (e) => {
 
     clearError();
 
+    // Todo 追加
     todos.push({ 
         id: nextId++,
         text,
         done: false,
-        date: getTodayString(),
+        date: targetDateInput.value || getTodayString(),
     } );
     input.value = '';
     input.focus();
@@ -156,6 +163,11 @@ filterButtons.forEach(button => {
         button.classList.add('is-active');
         render();
     });
+});
+
+// 日付変更時に再描画する
+tergetDataInput.addEventListener('change', () => {
+    render();
 });
 
 loadState();
