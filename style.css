@@ -37,8 +37,7 @@ body {
 .todo-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    gap: 8px;
 }
 
 .todo-item.is-done .todo-text {
@@ -54,6 +53,7 @@ body {
 .todo-delete {
     padding: 6px 10px;
     cursor: pointer;
+    margin-left: auto;
 }
 
 .todo-error {
@@ -80,4 +80,10 @@ body {
 
 .filter-button.is-active {
     background: #ddd;
+}
+
+.todo-date {
+    margin-left: 8px;
+    font-size: 0.9rem;
+    color: #666;
 }

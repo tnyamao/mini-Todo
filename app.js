@@ -35,6 +35,11 @@ function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+// 状態更新 （保存 → 再描画)
+function updateApp() {
+    saveState();
+    render();
+}
 
 // 状態の読み込み
 function loadState() {
@@ -87,6 +92,7 @@ function render() {
         return `
             <li class="todo-item ${doneClass}" data-id="${t.id}">
                 <span class="todo-text">${escapeHtml(t.text)}</span>
+                <span class="todo-date">${escapeHtml(t.date)}</span>
                 <button class="todo-delete" type="button">削除</button>
             </li>
         `;
@@ -116,8 +122,8 @@ form.addEventListener('submit', (e) => {
     } );
     input.value = '';
     input.focus();
-    saveState();
-    render();
+    // Todo追加
+    updateApp();
 });
 
 // クリックイベント発生時の処理
@@ -135,8 +141,8 @@ list.addEventListener('click', (e) => {
     if (e.target.closest('button.todo-delete')) {
         todos = todos.filter(x => x.id !== id);
 
-        saveState();
-        render();
+        // Todo 削除
+        updateApp();
         return;
     }
 
@@ -145,8 +151,8 @@ list.addEventListener('click', (e) => {
         if (!t) return;
         t.done = !t.done;
 
-        saveState();
-        render();
+        // 完了トグル
+        updateApp();
     }
 });
 
@@ -166,7 +172,7 @@ filterButtons.forEach(button => {
 });
 
 // 日付変更時に再描画する
-tergetDataInput.addEventListener('change', () => {
+targetDateInput.addEventListener('change', () => {
     render();
 });
 
@@ -181,4 +187,5 @@ function getTodayString() {
     return `${year}-${month}-${day}`;
 }
 
+targetDateInput.value = getTodayString();
 render();
