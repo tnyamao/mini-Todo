@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mini Todo</title>
     <link rel="stylesheet" href="./style.css" />
 </head>
@@ -10,18 +10,40 @@
     <main class="container">
         <h1>Mini Todo</h1>
 
+        <!-- Todo登録フォーム -->
         <form id="todo-form" class="todo-form" autocomplete="off">
-            <input id="target-date" type="date" />
-            <input id="todo-input" class="todo-input" type="text" placeholder="タスクを入力..." />
+            <!-- 登録用の日付 -->
+            <input id="todo-date" type="date" />
+
+            <!-- タスク入力欄 -->
+            <input
+                id="todo-input"
+                class="todo-input"
+                type="text"
+                placeholder="タスクを入力..."
+            />
+
+            <!-- 追加ボタン -->
             <button class="todo-add" type="submit">追加</button>
         </form>
 
+        <!-- 入力エラー表示 -->
         <p id="todo-error" class="todo-error" aria-live="polite"></p>
+
+        <!-- 状態フィルタ -->
         <div class="todo-filters" role="group" aria-label="表示フィルタ">
             <button type="button" class="filter-button is-active" data-filter="all">すべて</button>
             <button type="button" class="filter-button" data-filter="active">未完了</button>
             <button type="button" class="filter-button" data-filter="done">完了</button>
         </div>
+
+        <!-- 表示日フィルタ -->
+        <div class="date-filter">
+            <label for="filter-date">表示日:</label>
+            <input id="filter-date" type="date" />
+        </div>
+
+        <!-- Todo一覧 -->
         <ul id="todo-list" class="todo-list"></ul>
     </main>
 

@@ -1,16 +1,22 @@
 'use strict';
 
-
-// 定数宣言
+// DOM要素の取得
 const form = document.getElementById('todo-form');
 const input = document.getElementById('todo-input');
 const list = document.getElementById('todo-list');
 const errorEl = document.getElementById('todo-error');
 const filterButtons = document.querySelectorAll('.filter-button');
-const targetDateInput = document.getElementById('target-date');
+
+// 登録用日付入力欄
+const todoDateInput = document.getElementById('todo-date');
+
+// 表示用日付入力欄
+const filterDateInput = document.getElementById('filter-date');
+
+// 現在の状態フィルタ
 let currentFilter = 'all';
 
-// エラーメッセージ出力
+// エラーメッセージを表示
 function setError(message) {
     if (!errorEl) return;
     errorEl.textContent = message;
@@ -21,27 +27,27 @@ function clearError() {
     setError('');
 }
 
-
 let nextId = 1;
-/** @type {{id:number, text:string, done:boolean, date:string} []} */
+
+/** @type {{id:number, text:string, done:boolean, date:string}[]} */
 let todos = [];
 
-//  LocalStorage に保存するときのキー 
+// LocalStorageに保存するときのキー
 const STORAGE_KEY = 'miniTodo.v1';
 
-// 状態の保持
+// 状態をLocalStorageへ保存
 function saveState() {
     const state = { nextId, todos };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-// 状態更新 （保存 → 再描画)
+// 保存して再描画
 function updateApp() {
     saveState();
     render();
 }
 
-// 状態の読み込み
+// LocalStorageから状態読み込み
 function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
@@ -55,128 +61,55 @@ function loadState() {
         }
     } catch (error) {
         console.error('状態の読み込みに失敗しました。', error);
-
     }
 }
 
 // タスク名の入力に対するエスケープ処理 
 function escapeHtml(str) {
     return str
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
 }
 
-// 登録したタスクをフィルターする
+// 現在の条件でTodoを絞り込む
 function getFilteredTodos() {
     let filtered = todos;
-    const selectedDate = targetDateInput.value;
+
+    // 表示用日付で絞り込む
+    const selectedDate = filterDateInput.value;
     if (selectedDate) {
-        filtered = filtered.filter(t => t.date === selectedDate);    
+        filtered = filtered.filter((t) => t.date === selectedDate);
     }
 
+    // 状態で絞り込む
     if (currentFilter === 'active') {
-        filtered = filtered.filter(t => !t.done);
-    }   else if (currentFilter === 'done') {
-        filtered = filtered.filter(t => t.done);
+        filtered = filtered.filter((t) => !t.done);
+    } else if (currentFilter === 'done') {
+        filtered = filtered.filter((t) => t.done);
     }
-    return filtered
+
+    return filtered;
 }
 
-// タスクの表示処理
+// タスクの表示処理(Todo一覧を描画)
 function render() {
-    list.innerHTML = getFilteredTodos().map(t => {
-        const doneClass = t.done ? 'is-done' : '';
-        return `
-            <li class="todo-item ${doneClass}" data-id="${t.id}">
-                <span class="todo-text">${escapeHtml(t.text)}</span>
-                <span class="todo-date">${escapeHtml(t.date)}</span>
-                <button class="todo-delete" type="button">削除</button>
-            </li>
-        `;
-    }).join('');
+    list.innerHTML = getFilteredTodos()
+        .map((t) => {
+            const doneClass = t.done ? 'is-done' : '';
+
+            return `
+                <li class="todo-item ${doneClass}" data-id="${t.id}">
+                    <span class="todo-text">${escapeHtml(t.text)}</span>
+                    <span class="todo-date">${escapeHtml(t.date)}</span>
+                    <button class="todo-delete" type="button">削除</button>
+                </li>
+            `;
+        })
+        .join('');
 }
-
-// 画面表示処理
-// index.htmlを開いた際に最初に表示させる
-form.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const text = input.value.trim();
-    if (!text) {
-        setError('タスクを入力してください。');
-        input.focus();
-        return;
-    }
-
-    clearError();
-
-    // Todo 追加
-    todos.push({ 
-        id: nextId++,
-        text,
-        done: false,
-        date: targetDateInput.value || getTodayString(),
-    } );
-    input.value = '';
-    input.focus();
-    // Todo追加
-    updateApp();
-});
-
-// クリックイベント発生時の処理
-// 追加ボタン押下なら、タスクの追加
-// 削除ボタン押下なら、タスクの削除
-list.addEventListener('click', (e) => {
-    if (!(e.target instanceof Element)) {
-        return;
-    }
-    const li = e.target.closest('li.todo-item');
-    if (!li) return;
-    const id = Number(li.dataset.id);
-    if (Number.isNaN(id)) return;
-
-    if (e.target.closest('button.todo-delete')) {
-        todos = todos.filter(x => x.id !== id);
-
-        // Todo 削除
-        updateApp();
-        return;
-    }
-
-    if (e.target.closest('.todo-text')) {
-        const t = todos.find(x => x.id === id);
-        if (!t) return;
-        t.done = !t.done;
-
-        // 完了トグル
-        updateApp();
-    }
-});
-
-// フィルタ機能
-// 全選択、全解除、単体選択
-filterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        currentFilter = button.dataset.filter || 'all';
-
-        filterButtons.forEach(btn => {
-            btn.classList.remove('is-active');
-        });
-
-        button.classList.add('is-active');
-        render();
-    });
-});
-
-// 日付変更時に再描画する
-targetDateInput.addEventListener('change', () => {
-    render();
-});
-
-loadState();
 
 // 今日の日付を yyyy-mm-dd 形式で返す
 function getTodayString() {
@@ -187,5 +120,89 @@ function getTodayString() {
     return `${year}-${month}-${day}`;
 }
 
-targetDateInput.value = getTodayString();
+// フォーム送信時の処理
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const text = input.value.trim();
+
+    // 未入力ならエラー
+    if (!text) {
+        setError('タスクを入力してください。');
+        input.focus();
+        return;
+    }
+
+    clearError();
+
+    // Todoを追加
+    todos.push({
+        id: nextId++,
+        text,
+        done: false,
+        date: todoDateInput.value || getTodayString(),
+    });
+
+    // 入力欄をクリア
+    input.value = '';
+    input.focus();
+
+    updateApp();
+});
+
+// Todo一覧クリック時の処理
+list.addEventListener('click', (e) => {
+    if (!(e.target instanceof Element)) return;
+
+    const li = e.target.closest('li.todo-item');
+    if (!li) return;
+
+    const id = Number(li.dataset.id);
+    if (Number.isNaN(id)) return;
+
+    // 削除ボタンが押された場合
+    if (e.target.closest('button.todo-delete')) {
+        todos = todos.filter((x) => x.id !== id);
+        updateApp();
+        return;
+    }
+
+    // タスク文字を押したら完了切替
+    if (e.target.closest('.todo-text')) {
+        const todo = todos.find((x) => x.id === id);
+        if (!todo) return;
+
+        todo.done = !todo.done;
+        updateApp();
+    }
+});
+
+// 状態フィルタボタンの処理
+filterButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+        currentFilter = button.dataset.filter || 'all';
+
+        filterButtons.forEach((btn) => {
+            btn.classList.remove('is-active');
+        });
+
+        button.classList.add('is-active');
+        render();
+    });
+});
+
+// 表示用日付を変更したら再描画
+filterDateInput.addEventListener('change', () => {
+    render();
+});
+
+// 保存済みデータを読み込む
+loadState();
+
+// 初期値として今日の日付を入れる
+const today = getTodayString();
+todoDateInput.value = today;
+filterDateInput.value = today;
+
+// 初回描画
 render();
