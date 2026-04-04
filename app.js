@@ -12,6 +12,8 @@ const todoDateInput = document.getElementById('todo-date');
 
 // 表示用日付入力欄
 const filterDateInput = document.getElementById('filter-date');
+const prevDateButton = document.getElementById('prev-date-button');
+const nextDateButton = document.getElementById('next-date-button');
 
 // 現在の状態フィルタ
 let currentFilter = 'all';
@@ -120,6 +122,18 @@ function getTodayString() {
     return `${year}-${month}-${day}`;
 }
 
+// 指定した日付文字列を1日ずらして返す
+function moveDate(dateString, diffDays) {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + diffDays);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+
 // フォーム送信時の処理
 form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -195,6 +209,23 @@ filterButtons.forEach((button) => {
 filterDateInput.addEventListener('change', () => {
     render();
 });
+
+// 前日ボタンを押したら表示を1日戻す
+prevDateButton.addEventListener('click', () => {
+    const currentDate = filterDateInput.value || getTodayString();
+    filterDateInput.value = moveDate(currentDate, -1);
+    render();
+});
+
+// 翌日ボタンを押したら表示日を1日進める
+nextDateButton.addEventListener('click', () => {
+    const currentDate = filterDateInput.value || getTodayString();
+    filterDateInput.value = moveDate(currentDate, 1);
+    render();  
+});
+
+
+
 
 // 保存済みデータを読み込む
 loadState();
